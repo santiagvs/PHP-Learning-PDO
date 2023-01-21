@@ -18,9 +18,9 @@ class PdoStudentRepository implements StudentRepository
   private function insert(Student $student): bool
   {
     $insertQuery = 'INSERT INTO students (name, birth_date) VALUES (:name, :birth_date);';
-    $stmt = $this->connection->prepare($insertQuery);
+    $statement = $this->connection->prepare($insertQuery);
 
-    $success = $stmt->execute([
+    $success = $statement->execute([
       ':name' => $student->name(),
       ':birth_date' => $student->birthDate()->format(format: 'Y-m-d'),
     ]);
@@ -52,12 +52,12 @@ class PdoStudentRepository implements StudentRepository
   public function update(Student $student): bool
   {
     $updateQuery = 'UPDATE students SET name = :name, birth_date = :birth_date WHERE id = :id;';
-    $stmt = $this->connection->prepare($updateQuery);
-    $stmt->bindValue(':name', $student->name());
-    $stmt->bindValue(':birth_date', $student->birthDate()->format(format: 'Y-m-d'));
-    $stmt->bindValue(':id', $student->id(), PDO::PARAM_INT);
+    $statement = $this->connection->prepare($updateQuery);
+    $statement->bindValue(':name', $student->name());
+    $statement->bindValue(':birth_date', $student->birthDate()->format(format: 'Y-m-d'));
+    $statement->bindValue(':id', $student->id(), PDO::PARAM_INT);
 
-    return $stmt->execute();
+    return $statement->execute();
   }
 
   public function studentsBirthAt(\DateTimeInterface $birthDate): array
@@ -70,9 +70,9 @@ class PdoStudentRepository implements StudentRepository
     return $this->hydrateStudentList($statement);
   }
 
-  private function hydrateStudentList(\PDOStatement $stmt): array
+  private function hydrateStudentList(\PDOStatement $statement): array
   {
-    $studentDataList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $studentDataList = $statement->fetchAll();
     $studentList = [];
 
     foreach ($studentDataList as $studentData) {
