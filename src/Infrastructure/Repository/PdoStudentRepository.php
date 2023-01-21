@@ -4,21 +4,20 @@ namespace Alura\Pdo\Infrastructure\Repository;
 
 use Alura\Pdo\Domain\Model\Student;
 use Alura\Pdo\Domain\Repository\StudentRepository;
-use Alura\Pdo\Infrastructure\Persistence\ConnectionCreator;
 use PDO;
 
 class PdoStudentRepository implements StudentRepository
 {
   private PDO $connection;
 
-  public function __construct()
+  public function __construct(PDO $connection)
   {
-    $this->connection = ConnectionCreator::createConnection();
+    $this->connection = $connection;
   }
 
   private function insert(Student $student): bool
   {
-    $insertQuery = 'INSERT INTO students (name birth_date) VALUES (:name, :birth_date);';
+    $insertQuery = 'INSERT INTO students (name, birth_date) VALUES (:name, :birth_date);';
     $stmt = $this->connection->prepare($insertQuery);
 
     $success = $stmt->execute([
@@ -65,7 +64,7 @@ class PdoStudentRepository implements StudentRepository
   {
     $sqlQuery = 'SELECT * FROM students WHERE birth_date = ?;';
     $statement = $this->connection->query($sqlQuery);
-    $statement->bindValue(1, $birthDate->format('Y-m-d'));
+    $statement->bindValue(2, $birthDate->format('Y-m-d'));
     $statement->execute();
 
     return $this->hydrateStudentList($statement);
